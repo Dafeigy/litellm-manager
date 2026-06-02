@@ -1,8 +1,8 @@
 {
   "$schema": "https://raw.githubusercontent.com/nicepage/tauri/refs/heads/dev/crates/tauri-cli/schema.json",
-  "productName": "Litellm Admin",
-  "version": "0.1.0",
-  "identifier": "com.litellm.admin",
+  "productName": "Pontus",
+  "version": "1.0.0",
+  "identifier": "com.NUL4i.pontus",
   "build": {
     "frontendDist": "../dist",
     "devUrl": "http://localhost:1420",
@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "Litellm Admin",
+        "title": "Pontus",
         "width": 1100,
         "height": 750,
         "resizable": true,

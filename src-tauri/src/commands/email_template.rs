@@ -20,8 +20,8 @@ pub fn build_invite_email(
         <!-- Header -->
         <tr>
           <td style="background:linear-gradient(135deg,#2563eb,#1d4ed8);padding:32px 24px;text-align:center;">
-            <h1 style="color:#ffffff;font-size:22px;margin:0;font-weight:700;">🚀 欢迎加入 Litellm</h1>
-            <p style="color:#bfdbfe;font-size:14px;margin:8px 0 0 0;">您的专属 AI 网关已就绪</p>
+            <h1 style="color:#ffffff;font-size:22px;margin:0;font-weight:700;">🚀 欢迎使用 Litellm</h1>
+            <p style="color:#bfdbfe;font-size:14px;margin:8px 0 0 0;">您的模型服务已就绪</p>
           </td>
         </tr>
         <!-- Body -->
