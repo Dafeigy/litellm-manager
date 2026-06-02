@@ -1,0 +1,29 @@
+mod commands;
+
+use commands::{
+    config::get_config_cmd,
+    config::save_config_cmd,
+    config::is_initialized_cmd,
+    config::reset_api_key_cmd,
+    email::{invite_user, send_invite_email},
+    litellm::{create_user, generate_invitation, list_users},
+};
+
+#[cfg_attr(mobile, tauri::mobile_entry_point)]
+pub fn run() {
+    tauri::Builder::default()
+        .plugin(tauri_plugin_store::Builder::new().build())
+        .invoke_handler(tauri::generate_handler![
+            is_initialized_cmd,
+            get_config_cmd,
+            save_config_cmd,
+            reset_api_key_cmd,
+            create_user,
+            generate_invitation,
+            list_users,
+            send_invite_email,
+            invite_user,
+        ])
+        .run(tauri::generate_context!())
+        .expect("error while running tauri application");
+}

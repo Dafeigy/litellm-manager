@@ -1,0 +1,28 @@
+import { createRouter, createWebHashHistory } from "vue-router";
+
+const router = createRouter({
+  history: createWebHashHistory(),
+  routes: [
+    {
+      path: "/",
+      redirect: "/invite",
+    },
+    {
+      path: "/invite",
+      name: "invite",
+      component: () => import("@/views/InviteView.vue"),
+    },
+    {
+      path: "/settings",
+      name: "settings",
+      component: () => import("@/views/SettingsView.vue"),
+    },
+    {
+      path: "/dashboard",
+      name: "dashboard",
+      component: () => import("@/views/DashboardView.vue"),
+    },
+  ],
+});
+
+export default router;

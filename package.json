@@ -1,0 +1,38 @@
+{
+  "name": "litellm-admin",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "tauri": "tauri"
+  },
+  "dependencies": {
+    "vue": "^3.5.13",
+    "vue-router": "^4.5.0",
+    "pinia": "^2.3.0",
+    "@tauri-apps/api": "^2.2.0",
+    "@tauri-apps/plugin-store": "^2.2.0",
+    "radix-vue": "^1.9.10",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^2.6.0",
+    "lucide-vue-next": "^0.468.0",
+    "@vueuse/core": "^12.5.0",
+    "vue-sonner": "^1.3.0"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.2.0",
+    "@vitejs/plugin-vue": "^5.2.3",
+    "vite": "^6.1.0",
+    "typescript": "^5.7.3",
+    "vue-tsc": "^2.2.0",
+    "tailwindcss": "^3.4.17",
+    "postcss": "^8.5.1",
+    "autoprefixer": "^10.4.20",
+    "tailwindcss-animate": "^1.0.7",
+    "@types/node": "^22.13.0"
+  }
+}
