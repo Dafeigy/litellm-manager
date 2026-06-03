@@ -5,22 +5,27 @@ import Button from "@/components/ui/Button.vue";
 import Input from "@/components/ui/Input.vue";
 import Label from "@/components/ui/Label.vue";
 import Card from "@/components/ui/Card.vue";
-import Separator from "@/components/ui/Separator.vue";
 import { toast } from "vue-sonner";
 import type { AppConfig } from "@/stores/app";
+import { ArrowRight, Check } from "lucide-vue-next";
 
 const emit = defineEmits<{
   complete: [config: AppConfig];
 }>();
 
+const step = ref(1);
+const loading = ref(false);
+
+// Step 1 — required
 const apiKey = ref("");
 const litellmHost = ref("http://localhost:4000");
+
+// Step 2 — optional
 const smtpHost = ref("");
 const smtpPort = ref("465");
 const smtpSenderEmail = ref("");
 const smtpUsername = ref("");
 const smtpPassword = ref("");
-const loading = ref(false);
 
 function buildConfig(): AppConfig {
   return {
@@ -35,11 +40,19 @@ function buildConfig(): AppConfig {
   };
 }
 
-async function handleSave() {
+function goToStep2() {
+  if (!litellmHost.value.trim()) {
+    toast.error("请输入 Litellm 服务地址");
+    return;
+  }
   if (!apiKey.value.trim()) {
     toast.error("请输入 API Key");
     return;
   }
+  step.value = 2;
+}
+
+async function handleSave() {
   loading.value = true;
   try {
     const config = buildConfig();
@@ -53,11 +66,7 @@ async function handleSave() {
   }
 }
 
-async function handleSkipSmtp() {
-  if (!apiKey.value.trim()) {
-    toast.error("请输入 API Key");
-    return;
-  }
+async function handleSkip() {
   loading.value = true;
   try {
     const config = buildConfig();
@@ -75,126 +84,138 @@ async function handleSkipSmtp() {
 
 <template>
   <div class="flex h-screen items-center justify-center bg-background p-4">
-    <Card class="w-full max-w-lg p-8">
-      <div class="mb-6 text-center">
+    <Card class="w-full max-w-md p-8">
+      <!-- Header -->
+      <div class="mb-8 text-center">
         <div class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-secondary text-xl font-bold text-primary-foreground">
           🧊
         </div>
         <h1 class="text-xl font-bold">欢迎使用 Pontus</h1>
         <p class="mt-2 text-sm text-muted-foreground">
-          初次使用，请配置 Litellm 连接与 SMTP 邮件服务
+          {{ step === 1 ? "请先配置 Litellm 连接" : "配置 SMTP 邮件服务" }}
         </p>
       </div>
 
-      <div class="space-y-5">
-        <!-- Litellm 连接配置 -->
-        <div class="space-y-3">
-          <h3 class="text-sm font-semibold">Litellm 连接配置</h3>
+      <!-- Step indicators -->
+      <div class="mb-6 flex items-center justify-center gap-2">
+        <span
+          class="flex h-7 w-7 items-center justify-center rounded-full text-xs font-medium"
+          :class="step === 1 ? 'bg-primary text-primary-foreground' : 'bg-primary/15 text-primary'"
+        >1</span>
+        <span class="h-px w-8" :class="step === 1 ? 'bg-border' : 'bg-primary/40'" />
+        <span
+          class="flex h-7 w-7 items-center justify-center rounded-full text-xs font-medium"
+          :class="step === 2 ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'"
+        >2</span>
+      </div>
+
+      <!-- Step 1: Litellm connection -->
+      <div v-if="step === 1" class="space-y-4">
+        <div class="space-y-2">
+          <Label for="litellm-host">Litellm 服务地址</Label>
+          <Input
+            id="litellm-host"
+            v-model="litellmHost"
+            placeholder="http://localhost:4000"
+            @keyup.enter="goToStep2"
+          />
+        </div>
+        <div class="space-y-2">
+          <Label for="apikey">API Key</Label>
+          <Input
+            id="apikey"
+            v-model="apiKey"
+            type="password"
+            placeholder="sk-..."
+            @keyup.enter="goToStep2"
+          />
+          <p class="text-xs text-muted-foreground">
+            此 Key 将安全存储在本机
+          </p>
+        </div>
+
+        <Button class="w-full" @click="goToStep2">
+          下一步
+          <ArrowRight class="ml-2 h-4 w-4" />
+        </Button>
+      </div>
+
+      <!-- Step 2: SMTP -->
+      <div v-else class="space-y-4">
+        <div class="grid grid-cols-2 gap-3">
           <div class="space-y-2">
-            <Label for="litellm-host">Litellm 服务地址</Label>
+            <Label for="smtp-host">SMTP 服务器</Label>
             <Input
-              id="litellm-host"
-              v-model="litellmHost"
-              placeholder="http://localhost:4000"
+              id="smtp-host"
+              v-model="smtpHost"
+              placeholder="smtp.example.com"
               :disabled="loading"
             />
           </div>
           <div class="space-y-2">
-            <Label for="apikey">API Key</Label>
+            <Label for="smtp-port">端口</Label>
             <Input
-              id="apikey"
-              v-model="apiKey"
+              id="smtp-port"
+              v-model="smtpPort"
+              type="number"
+              placeholder="465"
+              :disabled="loading"
+            />
+          </div>
+        </div>
+        <div class="space-y-2">
+          <Label for="smtp-sender">发送者邮箱</Label>
+          <Input
+            id="smtp-sender"
+            v-model="smtpSenderEmail"
+            type="email"
+            placeholder="noreply@example.com"
+            :disabled="loading"
+          />
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div class="space-y-2">
+            <Label for="smtp-username">SMTP 用户名</Label>
+            <Input
+              id="smtp-username"
+              v-model="smtpUsername"
+              placeholder="user@example.com"
+              :disabled="loading"
+            />
+          </div>
+          <div class="space-y-2">
+            <Label for="smtp-password">SMTP 密码</Label>
+            <Input
+              id="smtp-password"
+              v-model="smtpPassword"
               type="password"
-              placeholder="sk-..."
-              :disabled="loading"
-              @keyup.enter="handleSave"
-            />
-            <p class="text-xs text-muted-foreground">
-              此 Key 将安全存储在本机
-            </p>
-          </div>
-        </div>
-
-        <Separator />
-
-        <!-- SMTP 邮件配置（可选） -->
-        <div class="space-y-3">
-          <h3 class="text-sm font-semibold">SMTP 邮件配置 <span class="font-normal text-muted-foreground">（可选）</span></h3>
-          <div class="grid grid-cols-2 gap-3">
-            <div class="space-y-2">
-              <Label for="smtp-host">SMTP 服务器</Label>
-              <Input
-                id="smtp-host"
-                v-model="smtpHost"
-                placeholder="smtp.example.com"
-                :disabled="loading"
-              />
-            </div>
-            <div class="space-y-2">
-              <Label for="smtp-port">端口</Label>
-              <Input
-                id="smtp-port"
-                v-model="smtpPort"
-                type="number"
-                placeholder="465"
-                :disabled="loading"
-              />
-            </div>
-          </div>
-          <div class="space-y-2">
-            <Label for="smtp-sender">发送者邮箱</Label>
-            <Input
-              id="smtp-sender"
-              v-model="smtpSenderEmail"
-              type="email"
-              placeholder="noreply@example.com"
+              placeholder="••••••••"
               :disabled="loading"
             />
           </div>
-          <div class="grid grid-cols-2 gap-3">
-            <div class="space-y-2">
-              <Label for="smtp-username">SMTP 用户名</Label>
-              <Input
-                id="smtp-username"
-                v-model="smtpUsername"
-                placeholder="user@example.com"
-                :disabled="loading"
-              />
-            </div>
-            <div class="space-y-2">
-              <Label for="smtp-password">SMTP 密码</Label>
-              <Input
-                id="smtp-password"
-                v-model="smtpPassword"
-                type="password"
-                placeholder="••••••••"
-                :disabled="loading"
-              />
-            </div>
-          </div>
         </div>
 
-        <!-- Actions -->
         <div class="flex gap-3 pt-2">
           <Button
             variant="outline"
             class="flex-1"
             :disabled="loading"
-            @click="handleSkipSmtp"
+            @click="handleSkip"
           >
-            {{ loading ? "保存中..." : "跳过 SMTP 设置" }}
+            {{ loading ? "保存中..." : "跳过" }}
           </Button>
           <Button
             class="flex-1"
             :disabled="loading"
             @click="handleSave"
           >
+            <Check v-if="!loading" class="mr-2 h-4 w-4" />
             {{ loading ? "保存中..." : "完成设置" }}
           </Button>
         </div>
 
         <p class="text-center text-xs text-muted-foreground">
-          所有配置可在设置页面随时修改
+          可稍后在设置页面配置 SMTP
         </p>
       </div>
     </Card>
