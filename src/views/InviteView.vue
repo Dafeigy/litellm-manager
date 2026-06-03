@@ -8,12 +8,13 @@ import Card from "@/components/ui/Card.vue";
 import Select from "@/components/ui/Select.vue";
 import { SelectItem, SelectItemText } from "radix-vue";
 import { toast } from "vue-sonner";
-import { Send, Loader2 } from "lucide-vue-next";
+import { Send, Loader2, UserPlus, Mail } from "lucide-vue-next";
 
 const userAlias = ref("");
 const userEmail = ref("");
 const userRole = ref("internal_user_viewer");
-const loading = ref(false);
+const step = ref<"form" | "sending">("form");
+const stepLabel = ref("");
 
 const roleOptions = [
   { value: "proxy_admin", label: "网关管理员 (proxy_admin)" },
@@ -32,31 +33,51 @@ async function handleInvite() {
     return;
   }
 
-  // Simple email validation
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(userEmail.value.trim())) {
     toast.error("请输入有效的邮箱地址");
     return;
   }
 
-  loading.value = true;
+  step.value = "sending";
+
+  // Step 1: Create user via Litellm API
+  stepLabel.value = "正在创建用户...";
+  let userId: string;
+  let apiKey: string;
   try {
-    const result = await invoke("invite_user", {
+    const result: any = await invoke("create_user", {
       userEmail: userEmail.value.trim(),
       userAlias: userAlias.value.trim(),
       userRole: userRole.value,
+      keyAlias: `${userAlias.value.trim()}-key`,
     });
-    const r = result as any;
-    toast.success("邀请成功！邮件已发送");
-    console.log("Invite result:", r);
-    // Clear form
+    userId = result.user_id;
+    apiKey = result.key;
+    toast.success(`用户创建成功 (ID: ${userId})`);
+  } catch (e) {
+    toast.error(`用户创建失败: ${e}`);
+    step.value = "form";
+    return;
+  }
+
+  // Step 2: Send invitation email
+  stepLabel.value = "正在发送邀请邮件...";
+  try {
+    await invoke("complete_invitation", {
+      userId,
+      userEmail: userEmail.value.trim(),
+      userAlias: userAlias.value.trim(),
+      apiKey,
+    });
+    toast.success("邀请邮件已发送");
     userAlias.value = "";
     userEmail.value = "";
   } catch (e) {
-    toast.error(`邀请失败: ${e}`);
-  } finally {
-    loading.value = false;
+    toast.error(`邮件发送失败: ${e}`);
   }
+
+  step.value = "form";
 }
 </script>
 
@@ -81,7 +102,7 @@ async function handleInvite() {
             id="alias"
             v-model="userAlias"
             placeholder="请输入用户备注名"
-            :disabled="loading"
+            :disabled="step === 'sending'"
           />
         </div>
 
@@ -93,7 +114,7 @@ async function handleInvite() {
             v-model="userEmail"
             type="email"
             placeholder="user@example.com"
-            :disabled="loading"
+            :disabled="step === 'sending'"
             @keyup.enter="handleInvite"
           />
         </div>
@@ -101,7 +122,7 @@ async function handleInvite() {
         <!-- Role -->
         <div class="space-y-2">
           <Label>用户角色</Label>
-          <Select v-model="userRole" placeholder="选择用户角色" :disabled="loading">
+          <Select v-model="userRole" placeholder="选择用户角色" :disabled="step === 'sending'">
             <SelectItem
               v-for="opt in roleOptions"
               :key="opt.value"
@@ -113,11 +134,24 @@ async function handleInvite() {
           </Select>
         </div>
 
+        <!-- Steps indicator -->
+        <div v-if="step === 'sending'" class="space-y-2 rounded-md bg-muted/50 p-3">
+          <div class="flex items-center gap-2 text-sm">
+            <UserPlus class="h-4 w-4 text-muted-foreground" />
+            <span class="text-muted-foreground">步骤 1/2：创建 Litellm 用户</span>
+          </div>
+          <div class="flex items-center gap-2 text-sm">
+            <Mail class="h-4 w-4 text-muted-foreground" />
+            <span class="text-muted-foreground">步骤 2/2：发送邀请邮件</span>
+          </div>
+          <p class="text-xs text-muted-foreground">{{ stepLabel }}</p>
+        </div>
+
         <!-- Submit -->
-        <Button class="w-full" size="lg" :disabled="loading" @click="handleInvite">
-          <Loader2 v-if="loading" class="mr-2 h-4 w-4 animate-spin" />
+        <Button class="w-full" size="lg" :disabled="step === 'sending'" @click="handleInvite">
+          <Loader2 v-if="step === 'sending'" class="mr-2 h-4 w-4 animate-spin" />
           <Send v-else class="mr-2 h-4 w-4" />
-          {{ loading ? "邀请发送中..." : "发送邀请" }}
+          {{ step === "sending" ? "处理中..." : "发送邀请" }}
         </Button>
       </div>
     </Card>

@@ -5,7 +5,7 @@ use commands::{
     config::save_config_cmd,
     config::is_initialized_cmd,
     config::reset_api_key_cmd,
-    email::{invite_user, send_invite_email},
+    email::{complete_invitation, invite_user, send_invite_email},
     litellm::{create_user, generate_invitation, list_users},
 };
 
@@ -22,6 +22,7 @@ pub fn run() {
             generate_invitation,
             list_users,
             send_invite_email,
+            complete_invitation,
             invite_user,
         ])
         .run(tauri::generate_context!())

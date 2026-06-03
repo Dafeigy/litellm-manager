@@ -100,16 +100,53 @@ fn validate_smtp_config(config: &AppConfig) -> Result<(), String> {
 }
 
 #[tauri::command]
+pub async fn complete_invitation(
+    app: AppHandle,
+    user_id: String,
+    user_email: String,
+    user_alias: String,
+    api_key: String,
+) -> Result<serde_json::Value, String> {
+    let result: Result<InviteResult, String> = tokio::task::spawn_blocking(move || {
+        // Step 1: Generate invitation
+        let invitation = generate_invitation_internal(&app, &user_id)?;
+
+        // Build invitation link
+        let config: AppConfig = get_config_cmd(app.clone())?;
+        let base_url = config.litellm_host.trim_end_matches('/');
+        let invitation_link = format!("{}/ui?invitation_id={}", base_url, invitation.id);
+
+        // Step 2: Send email
+        let html = build_invite_email(&user_alias, &user_email, &invitation_link, &api_key);
+        send_email(&config, &user_email, "欢迎加入 Litellm — 您的账号已就绪", html)?;
+
+        Ok(InviteResult {
+            user_id,
+            api_key,
+            invitation_id: invitation.id,
+            invitation_link,
+            user_email,
+        })
+    })
+    .await
+    .map_err(|e| format!("Task error: {}", e))?;
+
+    let result = result?;
+    serde_json::to_value(&result).map_err(|e| format!("Serialize error: {}", e))
+}
+
+#[tauri::command]
 pub async fn invite_user(
     app: AppHandle,
     user_email: String,
     user_alias: String,
     user_role: String,
+    key_alias: String,
 ) -> Result<serde_json::Value, String> {
     // Offload blocking I/O to a dedicated thread pool
     let result: Result<InviteResult, String> = tokio::task::spawn_blocking(move || {
         // Step 1: Create user
-        let user = create_user_internal(&app, &user_email, &user_alias, &user_role)?;
+        let user = create_user_internal(&app, &user_email, &user_alias, &user_role, &key_alias)?;
 
         // Step 2: Generate invitation
         let invitation = generate_invitation_internal(&app, &user.user_id)?;
