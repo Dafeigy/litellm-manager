@@ -39,10 +39,11 @@ async function handleSave() {
   <div class="flex h-screen items-center justify-center bg-background">
     <Card class="w-full max-w-md p-8">
       <div class="mb-6 text-center">
-        <div class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-xl font-bold text-primary-foreground">
-          LA
+        <div class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-secondary text-xl font-bold text-primary-foreground">
+          🧊
         </div>
-        <h1 class="text-xl font-bold">欢迎使用 Litellm Admin</h1>
+        <h1 class="text-xl font-bold">欢迎使用 Pontus</h1>
+        <p class="text-muted-foreground text-sm"></p>
         <p class="mt-2 text-sm text-muted-foreground">
           初次使用，请设置您的 Litellm API Key 以开始管理用户。
         </p>

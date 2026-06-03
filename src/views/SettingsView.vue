@@ -16,7 +16,7 @@ const store = useAppStore();
 const apiKey = ref("");
 const litellmHost = ref("http://localhost:4000");
 const smtpHost = ref("");
-const smtpPort = ref("587");
+const smtpPort = ref("465");
 const smtpSenderEmail = ref("");
 const smtpUsername = ref("");
 const smtpPassword = ref("");
@@ -30,7 +30,7 @@ onMounted(async () => {
     apiKey.value = config.apiKey || "";
     litellmHost.value = config.litellmHost || "http://localhost:4000";
     smtpHost.value = config.smtpHost || "";
-    smtpPort.value = String(config.smtpPort || 587);
+    smtpPort.value = String(config.smtpPort || 465);
     smtpSenderEmail.value = config.smtpSenderEmail || "";
     smtpUsername.value = config.smtpUsername || "";
     smtpPassword.value = config.smtpPassword || "";
@@ -47,7 +47,7 @@ async function saveConfig() {
       apiKey: apiKey.value,
       litellmHost: litellmHost.value,
       smtpHost: smtpHost.value,
-      smtpPort: Number(smtpPort.value) || 587,
+      smtpPort: Number(smtpPort.value) || 465,
       smtpSenderEmail: smtpSenderEmail.value,
       smtpUsername: smtpUsername.value,
       smtpPassword: smtpPassword.value,
@@ -128,7 +128,7 @@ function toggleTheme(val: boolean) {
           </div>
           <div class="space-y-2">
             <Label for="smtp-port">SMTP 端口</Label>
-            <Input id="smtp-port" v-model="smtpPort" type="number" placeholder="587" />
+            <Input id="smtp-port" v-model="smtpPort" type="number" placeholder="465" />
           </div>
         </div>
         <div class="space-y-2">

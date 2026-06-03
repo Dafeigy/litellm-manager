@@ -25,8 +25,8 @@ function isActive(path: string) {
     <!-- Sidebar -->
     <aside class="flex w-56 flex-col border-r bg-card">
       <div class="flex h-14 items-center gap-2 border-b px-4">
-        <div class="flex h-8 w-8 items-center justify-center rounded-md bg-primary text-sm font-bold text-primary-foreground">
-          LA
+        <div class="flex h-8 w-8 items-center justify-center rounded-md bg-secondary text-sm font-bold text-primary-foreground">
+          🧊
         </div>
         <span class="font-semibold">Litellm Admin</span>
       </div>
@@ -49,7 +49,7 @@ function isActive(path: string) {
         </router-link>
       </nav>
       <div class="border-t p-3 text-xs text-muted-foreground">
-        v0.1.0
+        v1.0.0
       </div>
     </aside>
 
