@@ -28,7 +28,7 @@ function isActive(path: string) {
         <div class="flex h-8 w-8 items-center justify-center rounded-md bg-secondary text-sm font-bold text-primary-foreground">
           🧊
         </div>
-        <span class="font-semibold">Litellm Admin</span>
+        <span class="font-semibold">Pontus</span>
       </div>
       <nav class="flex-1 space-y-1 p-3">
         <router-link

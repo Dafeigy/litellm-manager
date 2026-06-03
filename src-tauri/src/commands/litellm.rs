@@ -10,6 +10,7 @@ struct CreateUserRequest<'a> {
     user_email: &'a str,
     user_alias: &'a str,
     user_role: &'a str,
+    key_alias: &'a str,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -77,6 +78,7 @@ pub fn create_user_internal(
     user_email: &str,
     user_alias: &str,
     user_role: &str,
+    key_alias: &str
 ) -> Result<CreateUserResponse, String> {
     let (base_url, api_key) = get_api_config(app)?;
 
@@ -84,6 +86,7 @@ pub fn create_user_internal(
         user_email,
         user_alias,
         user_role,
+        key_alias,
     };
 
     let client = make_client();
@@ -171,9 +174,10 @@ pub async fn create_user(
     user_email: String,
     user_alias: String,
     user_role: String,
+    key_alias: String,
 ) -> Result<serde_json::Value, String> {
     let result = tokio::task::spawn_blocking(move || {
-        create_user_internal(&app, &user_email, &user_alias, &user_role)
+        create_user_internal(&app, &user_email, &user_alias, &user_role, &key_alias)
     })
     .await
     .map_err(|e| format!("Task error: {}", e))??;

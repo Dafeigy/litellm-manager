@@ -38,7 +38,7 @@ pub fn build_invite_email(
             <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:16px;margin-bottom:24px;">
               <tr>
                 <td style="padding:4px 0;">
-                  <span style="color:#64748b;font-size:13px;">注册邮箱</span><br>
+                  <span style="color:#64748b;font-size:13px;">注册邮箱/登录邮箱</span><br>
                   <span style="color:#1e293b;font-size:14px;font-weight:500;">{user_email}</span>
                 </td>
               </tr>

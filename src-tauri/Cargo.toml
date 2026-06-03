@@ -1,8 +1,8 @@
 [package]
-name = "litellm-admin"
-version = "0.1.0"
+name = "Pontus"
+version = "1.0.0"
 description = "Litellm Admin Desktop App"
-authors = ["you"]
+authors = ["Nul4i"]
 edition = "2021"
 
 [lib]
